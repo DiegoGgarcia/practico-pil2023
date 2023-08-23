@@ -1,0 +1,57 @@
+{% extends 'comun/base.html' %}
+{% import 'comun/paginado.html' as paginado %}
+{% import 'comun/modal_eliminar.html' as modal_eliminar %}
+
+{% block content %}
+<div class="container p-2 small"></div>
+	<h2 class="text-center">Personas</h2>
+	<a class="btn btn-success mb-3" href="{{ url_for('routes_personas.crear_persona') }}">Agregar persona</a>
+
+	<div id="personas-list">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Nombre</th>
+					<th>Apellido</th>
+					<th>Email</th>
+					<th>Edad</th>
+					<th>Genero</th>
+					<th></th>
+					<!-- ... (otros encabezados) ... -->
+				</tr>
+			</thead>
+			<tbody>
+				{% for persona in personas.items %}
+				<tr>
+					<td>{{ persona.id }}</td>
+					<td>{{ persona.nombre }}</td>
+					<td>{{ persona.apellido }}</td>
+					<td>{{ persona.email }}</td>
+					<td>{{ persona.age }}</td>
+					<td>{{ persona.genero.nombre }}</td>
+					<!-- ... (otros campos) ... -->
+					<td>
+						<a href="{{ url_for('routes_personas.editar_persona', persona_id=persona.id) }}"
+							class="btn btn-primary">Editar</a>
+						<button class="btn btn-danger" data-toggle="modal"
+							data-target="#eliminarModal{{ persona.id }}">Eliminar</button>
+					</td>
+				</tr>
+				<!-- Modal para confirmar la eliminación -->
+				{{ modal_eliminar.confirmar_eliminar(
+					persona.id,
+					url_for('routes_personas.eliminar_persona', persona_id=persona.id),
+					'¿Estás seguro de que deseas eliminar a ' ~ persona.nombre ~ ' ' ~ persona.apellido ~ '?'
+					) }}
+
+				{% endfor %}
+			</tbody>
+		</table>
+
+		{{ paginado.render_paginado('routes_personas.obtener_lista_paginada', personas) }}
+
+<a class="btn btn-primary" href="{{ url_for('routes.index') }}">Volver a Inicio</a>
+</div>
+
+{% endblock %}

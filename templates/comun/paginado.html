@@ -1,0 +1,27 @@
+{% macro render_paginado(endpoint, items) %}
+<nav aria-label="Paginación">
+    <ul class="pagination">
+        {% if items.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for(endpoint, page=1) }}">Primera</a>
+        </li>
+        {% endif %}
+
+        {% for num in items.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if num %}
+        <li class="page-item {% if num == items.page %}active{% endif %}">
+            <a class="page-link" href="{{ url_for(endpoint, page=num) }}">{{ num }}</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">...</span></li>
+        {% endif %}
+        {% endfor %}
+
+        {% if items.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for(endpoint, page=items.pages) }}">Última</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endmacro %}

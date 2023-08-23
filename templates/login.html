@@ -1,0 +1,15 @@
+{% extends 'comun/base.html' %}
+
+{% block content %}
+	<div class="container">
+		<h1>Login</h1>
+		<form method="post" action="/login">
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+			<label for="username">Username:</label>
+			<input type="text" name="username" required><br>
+			<label for="password">Password:</label>
+			<input type="password" name="password" required><br>
+			<input type="submit" value="Login">
+		</form>
+	</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'comun/base.html' %}
+
+{% block content %}
+<div class="container p-2">
+    <h2>Editar Persona</h2>
+    <form id="editar-persona-form" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="row">
+            <div class="col mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ persona.nombre }}">
+            </div>
+            <div class="col mb-3">
+                <label for="apellido" class="form-label">Apellido</label>
+                <input type="text" class="form-control" id="apellido" name="apellido" value="{{ persona.apellido }}">
+            </div>
+            <div class="col mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ persona.email }}">
+            </div>
+        </div>
+		<div class="row">
+			<div class="col mb-3">
+                <label for="birthdate" class="form-label">Fecha de Nacimiento (d-m-año)</label>
+                <input type="text" class="form-control" id="birthdate" name="birthdate" value="{{ persona.birthdate.strftime('%d-%m-%Y') }}">
+            </div>
+			<div class="col mb-3">
+                <label for="personal_id" class="form-label">DNI / Cedula</label>
+                <input type="text" class="form-control" id="personal_id" name="personal_id" value="{{ persona.personal_id }}">
+            </div>
+            <div class="col mb-3">
+                <label for="genero" class="form-label">Género</label>
+                <select class="form-control" id="genero" name="genero">
+                    {% for genero_option in genero_options %}
+                        <option value="{{ genero_option.nombre }}"
+                            {% if genero_option.nombre == persona.genero.nombre %}selected{% endif %}>
+                            {{ genero_option.nombre }}
+                        </option>
+                    {% endfor %}
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <div class="col mb-3">
+                <label for="otro_genero" class="form-label">Otro Género</label>
+                <input type="text" class="form-control" id="otro_genero" name="otro_genero">
+            </div>
+		</div>
+		<div class="row">
+			<div class="col mb-3">
+                <label for="pais" class="form-label">Pais</label>
+                <input type="text" class="form-control" id="pais" name="pais" value="{{ persona.lugar.pais.nombre }}">
+            </div>
+			<div class="col mb-3">
+                <label for="provincia" class="form-label">Provincia</label>
+                <input type="text" class="form-control" id="provincia" name="provincia" value="{{ persona.lugar.provincia.nombre }}">
+            </div>
+			<div class="col mb-3">
+                <label for="ciudad" class="form-label">Ciudad</label>
+                <input type="text" class="form-control" id="ciudad" name="ciudad" value="{{ persona.lugar.ciudad.nombre }}">
+            </div>
+			<div class="col mb-3">
+                <label for="barrio" class="form-label">Barrio</label>
+                <input type="text" class="form-control" id="barrio" name="barrio" value="{{ persona.lugar.barrio.nombre }}">
+            </div>
+		</div>
+		<div class="col mb-3 text-center">
+			<button class="btn btn-success btn-sm" type="submit" id="guardar-persona">Guardar Cambios</button>
+		</div>
+    </form>
+    <a class="btn btn-primary" href="{{ url_for('routes_personas.obtener_lista_paginada') }}">Volver a la Lista</a>
+</div>
+{% endblock %}

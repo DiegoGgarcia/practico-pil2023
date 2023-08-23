@@ -1,0 +1,12 @@
+Flask
+Flask_JWT_Extended
+Flask_Login
+Flask_RESTful
+flask_sqlalchemy
+Flask_WTF
+SQLAlchemy
+Werkzeug
+WTForms
+Gunicorn
+psycopg2
+python-dotenv
