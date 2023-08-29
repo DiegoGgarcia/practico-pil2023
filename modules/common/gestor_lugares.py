@@ -1,4 +1,4 @@
-from modules.common.gestor_comun import ResponseMessage, validaciones
+from modules.common.gestor_comun import ResponseMessage
 from modules.models.entities import Pais, Provincia, Ciudad, Barrio, Lugar, db
 
 class gestor_lugares(ResponseMessage):
@@ -21,3 +21,43 @@ class gestor_lugares(ResponseMessage):
 		lugares = query.all()
 
 		return lugares
+	
+	def consultar_paises(self, **kwargs):
+		paises = db.session.query(Pais).distinct().join(Lugar).all()
+		return paises
+	
+	def consultar_provincias(self, **kwargs):
+		provincias = (
+			db.session.query(Provincia)
+			.distinct()
+			.join(Lugar)
+			.join(Pais)
+			.filter(Pais.nombre == kwargs["pais"])
+			.all()
+		)
+		return provincias
+
+	def consultar_ciudades(self, **kwargs):
+		ciudades = (
+			db.session.query(Ciudad)
+			.distinct()
+			.join(Lugar)
+			.join(Pais)
+			.join(Provincia)
+			.filter(Pais.nombre == kwargs["pais"], Provincia.nombre == kwargs["provincia"])
+			.all()
+		)
+		return ciudades
+
+	def consultar_barrios(self, **kwargs):
+		barrios = (
+			db.session.query(Barrio)
+			.distinct()
+			.join(Lugar)
+			.join(Pais)
+			.join(Provincia)
+			.join(Ciudad)
+			.filter(Pais.nombre == kwargs["pais"], Provincia.nombre == kwargs["provincia"], Ciudad.nombre == kwargs["ciudad"])
+			.all()
+		)
+		return barrios

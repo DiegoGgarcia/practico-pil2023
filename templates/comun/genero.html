@@ -1,0 +1,54 @@
+{% macro campo_genero(selected_genero) %}
+<label for="genero" class="form-label">Género</label>
+<select class="form-control" id="genero" name="genero">
+	<option value="" disabled selected>Seleccionar Género</option>
+	<!-- Opciones cargadas desde la API -->
+</select>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const generoSelect = document.getElementById("genero");
+		const seleccionAnterior = "{{ selected_genero }}"; // Valor enviado desde la macro
+
+		// Cargar opciones desde la API
+		fetch('/api/generos')
+			.then(response => response.json())
+			.then(data => {
+				if (data.Exito) {
+					const generos = data.Resultado;
+					generos.forEach(genero => {
+						const option = document.createElement("option");
+						option.value = genero.nombre;
+						option.textContent = genero.nombre;
+						generoSelect.appendChild(option);
+					});
+
+					// Seleccionar el género enviado
+					generoSelect.value = seleccionAnterior;
+					
+					const otraOpcion = document.createElement("option");
+					otraOpcion.value = "Otro";
+					otraOpcion.textContent = "Otro";
+					generoSelect.appendChild(otraOpcion);
+				}
+			})
+			.catch(error => console.error("Error al cargar los géneros:", error));
+
+		$('#genero').change(function() {
+			if ($(this).val() === 'Otro') {
+				const nuevoGenero = prompt("Ingrese nuevo género:");
+				if (nuevoGenero) {
+					const nuevaOpcion = document.createElement("option");
+					nuevaOpcion.value = nuevoGenero;
+					nuevaOpcion.textContent = nuevoGenero;
+					generoSelect.insertBefore(nuevaOpcion, generoSelect.lastElementChild);
+					generoSelect.value = nuevoGenero;
+				} else {
+					// Restaurar la selección anterior
+					generoSelect.value = seleccionAnterior;
+				}
+			}
+		});
+	});
+</script>
+{% endmacro %}

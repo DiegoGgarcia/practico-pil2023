@@ -2,6 +2,7 @@ from modules.common.gestor_comun import ResponseMessage, validaciones
 from modules.models.entities import Persona, Genero, Pais, Provincia, Ciudad, Barrio, Lugar
 from config import registros_por_pagina
 from datetime import datetime
+from sqlalchemy import or_
 
 class gestor_personas(ResponseMessage):
 	def __init__(self):
@@ -49,8 +50,28 @@ class gestor_personas(ResponseMessage):
 			self.MensajePorFallo = "Fecha de nacimiento inválida"
 			return False
 	
-	def obtener_pagina(self, pagina):
-		personas, total_paginas = Persona.obtener_paginado(pagina,registros_por_pagina)
+	def obtener_pagina(self, pagina, **kwargs):
+		query = Persona.query
+		if 'nombre' in kwargs:
+			query = query.filter(Persona.nombre.ilike(f"%{kwargs['nombre']}%"))
+		if 'apellido' in kwargs:
+			query = query.filter(Persona.apellido.ilike(f"%{kwargs['apellido']}%"))
+		if 'personal_id' in kwargs:
+			query = query.filter(Persona.personal_id.ilike(f"%{kwargs['personal_id']}%"))
+		if 'email' in kwargs:
+			query = query.filter(Persona.email.ilike(f"%{kwargs['email']}%"))
+		if 'genero' in kwargs:
+			query = query.join(Genero).filter(Genero.nombre == kwargs['genero'])
+		if 'pais' in kwargs:
+			query = query.join(Lugar).join(Pais).filter(Pais.nombre.ilike(f"%{kwargs['pais']}%"))
+		if 'provincia' in kwargs:
+			query = query.join(Lugar).join(Provincia).filter(Provincia.nombre.ilike(f"%{kwargs['provincia']}%"))
+		if 'ciudad' in kwargs:
+			query = query.join(Lugar).join(Ciudad).filter(Ciudad.nombre.ilike(f"%{kwargs['ciudad']}%"))
+		if 'barrio' in kwargs:
+			query = query.join(Lugar).join(Barrio).filter(Barrio.nombre.ilike(f"%{kwargs['barrio']}%"))
+
+		personas, total_paginas = Persona.obtener_paginado(query, pagina, registros_por_pagina)
 		return personas, total_paginas
 
 	def obtener(self, id):

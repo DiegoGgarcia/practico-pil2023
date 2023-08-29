@@ -1,0 +1,223 @@
+{% macro campos_lugares(selected_pais,selected_provincia,selected_ciudad,selected_barrio) %}
+<div class="col mb-3">
+	<label for="pais" class="form-label">País</label>
+	<select class="form-control" id="pais" name="pais">
+		<option value="" disabled selected>Seleccionar País</option>
+	</select>
+</div>
+<div class="col mb-3">
+	<label for="provincia" class="form-label">Provincia</label>
+	<select class="form-control" id="provincia" name="provincia" disabled>
+		<option value="" disabled selected>Seleccionar Provincia</option>
+	</select>
+</div>
+<div class="col mb-3">
+	<label for="ciudad" class="form-label">Ciudad</label>
+	<select class="form-control" id="ciudad" name="ciudad" disabled>
+		<option value="" disabled selected>Seleccionar Ciudad</option>
+	</select>
+</div>
+<div class="col mb-3">
+	<label for="barrio" class="form-label">Barrio</label>
+	<select class="form-control" id="barrio" name="barrio" disabled>
+		<option value="" disabled selected>Seleccionar Barrio</option>
+	</select>
+</div>
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const paisSelect = document.getElementById("pais");
+		const provinciaSelect = document.getElementById("provincia");
+		const ciudadSelect = document.getElementById("ciudad");
+		const barrioSelect = document.getElementById("barrio");
+		const seleccionPaisAnterior = "{{ selected_pais }}"; // Valor enviado desde la macro
+		const seleccionProvinciaAnterior = "{{ selected_provincia }}"; // Valor enviado desde la macro
+		const seleccionCiudadAnterior = "{{ selected_ciudad }}"; // Valor enviado desde la macro
+		const seleccionBarrioAnterior = "{{ selected_barrio }}"; // Valor enviado desde la macro
+
+		// Cargar opciones de País desde la API
+		fetch('/api/lugares/obtener_paises')
+			.then(response => response.json())
+			.then(data => {
+				if (data.Exito) {
+					const paises = data.Resultado;
+					paises.forEach(pais => {
+						const option = document.createElement("option");
+						option.value = pais.nombre;
+						option.textContent = pais.nombre;
+						paisSelect.appendChild(option);
+						if (pais.nombre===seleccionPaisAnterior){paisSelect.value = seleccionPaisAnterior;}
+					});
+					const otraOpcion = document.createElement("option");
+					otraOpcion.value = "Otro";
+					otraOpcion.textContent = "Otro";
+					paisSelect.appendChild(otraOpcion);
+
+					// Disparar manualmente el evento change del país
+					const changeEvent = new Event('change');
+					paisSelect.dispatchEvent(changeEvent);
+				}
+			})
+			.catch(error => console.error("Error al cargar los países:", error));
+
+		// Evento de cambio para País
+		paisSelect.addEventListener('change', function () {
+			const selectedPais = this.value;
+
+			// Resetear las opciones anteriores
+			provinciaSelect.innerHTML = '<option value="" disabled selected>Seleccionar Provincia</option>';
+			ciudadSelect.innerHTML = '<option value="" disabled selected>Seleccionar Ciudad</option>';
+			barrioSelect.innerHTML = '<option value="" disabled selected>Seleccionar Barrio</option>';
+			provinciaSelect.disabled = true;
+			ciudadSelect.disabled = true;
+			barrioSelect.disabled = true;
+
+			// Cargar opciones de Provincia desde la API
+			if (selectedPais) {
+				fetch('/api/lugares/obtener_provincias', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ pais: selectedPais })
+				})
+					.then(response => response.json())
+					.then(data => {
+						if (data.Exito) {
+							const provincias = data.Resultado;
+							provincias.forEach(provincia => {
+								const option = document.createElement("option");
+								option.value = provincia.nombre;
+								option.textContent = provincia.nombre;
+								provinciaSelect.appendChild(option);
+								if (provincia.nombre===seleccionProvinciaAnterior){provinciaSelect.value = seleccionProvinciaAnterior;}
+							});
+							provinciaSelect.disabled = false;
+							const otraOpcion = document.createElement("option");
+							otraOpcion.value = "Otro";
+							otraOpcion.textContent = "Otro";
+							provinciaSelect.appendChild(otraOpcion);
+							// Disparar manualmente el evento change de provincia
+							const changeEvent = new Event('change');
+							provinciaSelect.dispatchEvent(changeEvent);
+
+						}
+					})
+					.catch(error => console.error("Error al cargar las provincias:", error));
+			}
+		});
+
+		// Evento de cambio para Provincia
+		provinciaSelect.addEventListener('change', function () {
+			const selectedPais = paisSelect.value;
+			const selectedProvincia = this.value;
+
+			// Resetear las opciones anteriores
+			ciudadSelect.innerHTML = '<option value="" disabled selected>Seleccionar Ciudad</option>';
+			barrioSelect.innerHTML = '<option value="" disabled selected>Seleccionar Barrio</option>';
+			ciudadSelect.disabled = true;
+			barrioSelect.disabled = true;
+
+			// Cargar opciones de Ciudad desde la API
+			if (selectedPais && selectedProvincia) {
+				fetch('/api/lugares/obtener_ciudades', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ pais: selectedPais, provincia: selectedProvincia })
+				})
+					.then(response => response.json())
+					.then(data => {
+						if (data.Exito) {
+							const ciudades = data.Resultado;
+							ciudades.forEach(ciudad => {
+								const option = document.createElement("option");
+								option.value = ciudad.nombre;
+								option.textContent = ciudad.nombre;
+								ciudadSelect.appendChild(option);
+								if (ciudad.nombre===seleccionCiudadAnterior){ciudadSelect.value = seleccionCiudadAnterior;}
+							});
+							ciudadSelect.disabled = false;
+							const otraOpcion = document.createElement("option");
+							otraOpcion.value = "Otro";
+							otraOpcion.textContent = "Otro";
+							ciudadSelect.appendChild(otraOpcion);
+							// Disparar manualmente el evento change de ciudad
+							const changeEvent = new Event('change');
+							ciudadSelect.dispatchEvent(changeEvent);
+						}
+					})
+					.catch(error => console.error("Error al cargar las ciudades:", error));
+			}
+		});
+
+		// Evento de cambio para Ciudad
+		ciudadSelect.addEventListener('change', function () {
+			const selectedPais = paisSelect.value;
+			const selectedProvincia = provinciaSelect.value;
+			const selectedCiudad = this.value;
+
+			// Resetear las opciones anteriores
+			barrioSelect.innerHTML = '<option value="" disabled selected>Seleccionar Barrio</option>';
+			barrioSelect.disabled = true;
+
+			// Cargar opciones de Barrio desde la API
+			if (selectedPais && selectedProvincia && selectedCiudad) {
+				fetch('/api/lugares/obtener_barrios', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ pais: selectedPais, provincia: selectedProvincia, ciudad: selectedCiudad })
+				})
+					.then(response => response.json())
+					.then(data => {
+						if (data.Exito) {
+							const barrios = data.Resultado;
+							barrios.forEach(barrio => {
+								const option = document.createElement("option");
+								option.value = barrio.nombre;
+								option.textContent = barrio.nombre;
+								barrioSelect.appendChild(option);
+								if (barrio.nombre===seleccionBarrioAnterior){barrioSelect.value = seleccionBarrioAnterior;}
+							});
+							barrioSelect.disabled = false;
+							const otraOpcion = document.createElement("option");
+							otraOpcion.value = "Otro";
+							otraOpcion.textContent = "Otro";
+							barrioSelect.appendChild(otraOpcion);
+							// Disparar manualmente el evento change de barrio
+							const changeEvent = new Event('change');
+							barrioSelect.dispatchEvent(changeEvent);
+						}
+					})
+					.catch(error => console.error("Error al cargar los barrios:", error));
+			}
+		});
+
+		// Agregar opción "Otro" y manejar entrada de nuevos elementos
+		const selects = [paisSelect, provinciaSelect, ciudadSelect, barrioSelect];
+		selects.forEach(select => {
+			select.addEventListener('change', function () {
+				if (select.value === 'Otro') {
+					const nuevoElemento = prompt(`Ingrese nuevo valor para ${select.id}`);
+					if (nuevoElemento) {
+						const nuevaOpcion = document.createElement("option");
+						nuevaOpcion.value = nuevoElemento;
+						nuevaOpcion.textContent = nuevoElemento;
+						select.insertBefore(nuevaOpcion, select.lastElementChild);
+						select.value = nuevoElemento;
+					} else {
+						// Restaurar la selección anterior
+						select.value = select.id === 'pais' ? seleccionPaisAnterior :
+							select.id === 'provincia' ? seleccionProvinciaAnterior :
+								select.id === 'ciudad' ? seleccionCiudadAnterior :
+									select.id === 'barrio' ? seleccionBarrioAnterior :
+										"";
+					}
+				}
+			});
+		});
+	});
+</script>
+{% endmacro %}

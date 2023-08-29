@@ -1,4 +1,6 @@
 {% extends 'comun/base.html' %}
+{% import 'comun/genero.html' as genero %}
+{% import 'comun/lugares.html' as lugares %}
 
 {% block content %}
 <div class="container p-2">
@@ -8,65 +10,41 @@
         <div class="row">
             <div class="col mb-3">
                 <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ formulario_data.get('nombre', '') }}">
+                <input type="text" class="form-control" id="nombre" name="nombre"
+                    value="{{ formulario_data.get('nombre', '') }}">
             </div>
             <div class="col mb-3">
                 <label for="apellido" class="form-label">Apellido</label>
-                <input type="text" class="form-control" id="apellido" name="apellido" value="{{ formulario_data.get('apellido', '') }}">
+                <input type="text" class="form-control" id="apellido" name="apellido"
+                    value="{{ formulario_data.get('apellido', '') }}">
             </div>
             <div class="col mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ formulario_data.get('email', '') }}">
+                <input type="email" class="form-control" id="email" name="email"
+                    value="{{ formulario_data.get('email', '') }}">
             </div>
         </div>
-		<div class="row">
-			<div class="col mb-3">
+        <div class="row">
+            <div class="col mb-3">
                 <label for="birthdate" class="form-label">Fecha de Nacimiento (d-m-año)</label>
-                <input type="text" class="form-control" id="birthdate" name="birthdate" value="{{ formulario_data.get('birthdate', '') }}">
+                <input type="text" class="form-control" id="birthdate" name="birthdate"
+                    value="{{ formulario_data.get('birthdate', '') }}">
             </div>
-			<div class="col mb-3">
+            <div class="col mb-3">
                 <label for="personal_id" class="form-label">DNI / Cedula</label>
-                <input type="text" class="form-control" id="personal_id" name="personal_id" value="{{ formulario_data.get('personal_id', '') }}">
-            </div>
-
-            <div class="col mb-3">
-                <label for="genero" class="form-label">Género</label>
-                <select class="form-control" id="genero" name="genero">
-                    {% for genero_option in genero_options %}
-                        <option value="{{ genero_option.nombre }}"
-                            {% if genero_option.nombre == formulario_data.get('genero', '') %}selected{% endif %}>
-                            {{ genero_option.nombre }}
-                        </option>
-                    {% endfor %}
-                    <option value="Otro">Otro</option>
-                </select>
+                <input type="text" class="form-control" id="personal_id" name="personal_id"
+                    value="{{ formulario_data.get('personal_id', '') }}">
             </div>
             <div class="col mb-3">
-                <label for="otro_genero" class="form-label">Otro Género</label>
-                <input type="text" class="form-control" id="otro_genero" name="otro_genero">
+                {{ genero.campo_genero("" ) }}
             </div>
-		</div>
-		<div class="row">
-			<div class="col mb-3">
-                <label for="pais" class="form-label">Pais</label>
-                <input type="text" class="form-control" id="pais" name="pais" value="{{ formulario_data.get('pais', '') }}">
-            </div>
-			<div class="col mb-3">
-                <label for="provincia" class="form-label">Provincia</label>
-                <input type="text" class="form-control" id="provincia" name="provincia" value="{{ formulario_data.get('provincia', '') }}">
-            </div>
-			<div class="col mb-3">
-                <label for="ciudad" class="form-label">Ciudad</label>
-                <input type="text" class="form-control" id="ciudad" name="ciudad" value="{{ formulario_data.get('ciudad', '') }}">
-            </div>
-			<div class="col mb-3">
-                <label for="barrio" class="form-label">Barrio</label>
-                <input type="text" class="form-control" id="barrio" name="barrio" value="{{ formulario_data.get('barrio', '') }}">
-            </div>
-		</div>
-		<div class="col mb-3 text-center">
-			<button class="btn btn-success btn-sm" type="submit" id="crear-persona">Crear Persona</button>
-		</div>
+        </div>
+        <div class="row mb-3">
+            {{ lugares.campos_lugares("", "", "", "") }}
+        </div>
+        <div class="col mb-3 text-center">
+            <button class="btn btn-success btn-sm" type="submit" id="crear-persona">Crear Persona</button>
+        </div>
     </form>
     <a class="btn btn-primary" href="{{ url_for('routes_personas.obtener_lista_paginada') }}">Volver a la Lista</a>
 </div>

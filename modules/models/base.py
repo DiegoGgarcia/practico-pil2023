@@ -1,4 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
+import flask_sqlalchemy
+from sqlalchemy import and_
+from sqlalchemy.inspection import inspect
 from math import ceil
 
 db = SQLAlchemy()
@@ -45,11 +48,11 @@ class BaseEntity(db.Model):
 			serializable_data[column.name] = getattr(self, column.name)
 		return serializable_data
 	
-	@classmethod
-	def obtener_paginado(cls, pagina, items_por_pagina):
-		total_objetos = cls.query.count()
+	@staticmethod
+	def obtener_paginado(query, pagina, items_por_pagina):
+		total_objetos = query.count()
 		total_paginas = ceil(total_objetos / items_por_pagina)
-		objetos = cls.query.paginate(page=pagina, per_page=items_por_pagina)
+		objetos = query.paginate(page=pagina, per_page=items_por_pagina)
 		return objetos, total_paginas
 	
 	@classmethod

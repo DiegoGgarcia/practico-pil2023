@@ -3,7 +3,8 @@ from flask_login import login_required, logout_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, IntegerField
 from wtforms.validators import DataRequired, Email, Length, NumberRange
-from modules.models.entities import Persona
+from modules.common.gestor_email import gestor_email 
+
 from flask import Blueprint
 
 routes_bp = Blueprint('routes', __name__)
@@ -30,22 +31,23 @@ def index():
     return render_template('index.html')
 
 @routes_bp.route('/about')
-@login_required
 def about():
     return render_template('about.html')
 
 @routes_bp.route('/contact', methods=['GET', 'POST'])
-@login_required
 def contact():
     form = ContactForm()
     if form.validate_on_submit():
-        session['name'] = form.name.data
-        flash('Formulario enviado con éxito', 'success')
-        return redirect(url_for('routes.index')) 
+        email = form.email.data
+        nombre = form.name.data
+        mensaje_enviado = form.message.data
 
+        mensaje_respuesta= f'Hola {nombre}\nGracias por contactarnos.\n\nSu mensaje:\n{mensaje_enviado}'
+        resultado=gestor_email().enviar_email(email,"Formulario de contacto",mensaje_respuesta)
+        if resultado["Exito"]:
+            flash('Formulario enviado con éxito', 'success')
+            return redirect(url_for('routes.index'))
+        else:
+            flash(resultado["MensajePorFallo"], 'warning')
     return render_template('contact.html', form=form)
 
-@routes_bp.route('/calificaciones')
-@login_required
-def calificaciones():
-    return render_template('calificaciones.html')

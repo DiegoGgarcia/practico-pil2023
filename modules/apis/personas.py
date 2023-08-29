@@ -1,21 +1,22 @@
-from flask_restful import Resource, reqparse
-from flask import jsonify, request
-from flask_login import login_required
+from flask_restful import Resource
+from flask import request
 from modules.common.gestor_personas import gestor_personas
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from modules.auth import jwt_or_login_required
 
 class PersonasResource(Resource):
 
-	@jwt_required()
+	@jwt_or_login_required()
 	def get(self, persona_id=None):
 		if persona_id is None:
 			data = request.get_json() 
 			pagina = data.get('pagina') 
-			personas, total_paginas = gestor_personas().obtener_pagina(pagina)
+			filtros = data.get('filtros', {})
+			personas, total_paginas = gestor_personas().obtener_pagina(pagina, **filtros)
 			personas_data=[]
 			for persona in personas:
 				pd=persona.serialize()
 				pd["birthdate"]=persona.birthdate.isoformat()
+				pd["genero"]=persona.genero.nombre
 				pd["pais"]=persona.lugar.pais.nombre
 				pd["provincia"]=persona.lugar.provincia.nombre
 				pd["ciudad"]=persona.lugar.ciudad.nombre
@@ -36,7 +37,7 @@ class PersonasResource(Resource):
 			else:
 				return {"Exito":resultado["Exito"],"MensajePorFallo":resultado["MensajePorFallo"],"Resultado":None}, 400
 
-	@jwt_required()
+	@jwt_or_login_required()
 	def post(self):
 		args = request.get_json() 
 		resultado=gestor_personas().crear(**args)
@@ -51,8 +52,17 @@ class PersonasResource(Resource):
 			return {"Exito":resultado["Exito"],"MensajePorFallo":resultado["MensajePorFallo"],"Resultado":persona_data}, 201
 		else:
 			return {"Exito":resultado["Exito"],"MensajePorFallo":resultado["MensajePorFallo"],"Resultado":None}, 400
-
-	@jwt_required()
+		
+	@jwt_or_login_required()
+	def put(self):
+		args = request.get_json() 
+		resultado = gestor_personas().editar(**args)
+		if resultado["Exito"]:
+			return {"Exito":resultado["Exito"],"MensajePorFallo":resultado["MensajePorFallo"],"Resultado":None}, 201
+		else:
+			return {"Exito":resultado["Exito"],"MensajePorFallo":resultado["MensajePorFallo"],"Resultado":None}, 400
+		
+	@jwt_or_login_required()
 	def delete(self, persona_id):
 		resultado=gestor_personas().obtener(persona_id)
 		if resultado["Exito"]:

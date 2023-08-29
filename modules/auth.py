@@ -5,8 +5,9 @@ from flask import Blueprint
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required
 from flask_wtf.csrf import CSRFProtect
+from functools import wraps
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -65,3 +66,18 @@ def login_jwt():
 def logout():
     logout_user()
     return redirect(url_for('auth.login'))
+
+def jwt_or_login_required():
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            try:
+                jwt_required()(lambda: None)()
+            except:
+                if current_user.is_authenticated:
+                    return f(*args, **kwargs)
+                return {"message": "Acceso no autorizado"}, 401
+            return f(*args, **kwargs)
+
+        return decorated_function
+    return decorator
