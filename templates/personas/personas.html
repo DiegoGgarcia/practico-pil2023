@@ -5,7 +5,16 @@
 {% block content %}
 <div class="container p-2 small"></div>
 	<h2 class="text-center">Personas</h2>
-	<a class="btn btn-success mb-3" href="{{ url_for('routes_personas.crear_persona') }}">Agregar persona</a>
+	<div class="row">
+		<div class="col-md-3">
+			<a class="btn btn-success mb-3" href="{{ url_for('routes_personas.crear_persona') }}">Agregar persona</a>
+			</div>	
+			<div class="col-md-3">
+				<form method="GET" action="{{ url_for('routes_personas.generar_excel') }}" class="mb-3">
+					<button class="btn btn-info mb-3" type="submit">Reporte Excel</button>
+				</form>
+			</div>
+		</div>
 
 	<form method="GET" action="{{ url_for('routes_personas.obtener_lista_paginada') }}" class="mb-3">
 		<div class="row">
