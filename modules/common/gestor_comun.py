@@ -25,12 +25,10 @@ class validaciones:
             return True
         else:
             return False
-        
 class exportar:
     def exportar_excel(datos):
         wb = Workbook()
         ws = wb.active
-
 
         # Agregar encabezados de columnas (suponemos que todos los diccionarios tienen las mismas claves)
         headers = list(datos[0].keys())
