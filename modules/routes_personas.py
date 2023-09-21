@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template,flash, request, redirect, url_for
 from flask_login import login_required
 from modules.common.gestor_personas import gestor_personas
+from modules.common.gestor_carreras_personas import gestor_carreras_personas
 from modules.common.gestor_generos import gestor_generos
 from modules.common.gestor_comun import exportar
 from flask import Blueprint
@@ -24,9 +25,14 @@ def obtener_lista_paginada():
     personas, total_paginas = gestor_personas().obtener_pagina(page, **filtros)
     return render_template('personas/personas.html', personas=personas, total_paginas=total_paginas, csrf=csrf, filtros=filtros)
 
-@personas_bp.route('/personas/<int:persona_id>/editar', methods=['GET', 'POST'])
+@personas_bp.route('/personas/editar', methods=['GET', 'POST'])
 @login_required
-def editar_persona(persona_id):
+def editar_persona():
+    persona_id = request.args.get('persona_id', type=int)
+    page = request.args.get('page', default=1, type=int)
+    filtros = {
+        'persona_id': persona_id
+    }
     if request.method == 'POST':
         formulario_data = request.form.to_dict()
         resultado=gestor_personas().editar(persona_id, **formulario_data)
@@ -39,7 +45,8 @@ def editar_persona(persona_id):
     resultado=gestor_personas().obtener(persona_id)
     if resultado["Exito"]:
         persona=resultado["Resultado"]
-        return render_template('personas/editar_persona.html', persona=persona, csrf=csrf)
+        resultado_carreras, total_paginas = gestor_carreras_personas().obtener_pagina(page, persona=persona)
+        return render_template('personas/editar_persona.html', persona=persona, resultado_carreras=resultado_carreras, total_paginas=total_paginas,filtros=filtros,csrf=csrf)
     else:
         flash(resultado["MensajePorFallo"], 'warning')
         return redirect(url_for('routes_personas.obtener_lista_paginada'))

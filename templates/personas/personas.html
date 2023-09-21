@@ -3,7 +3,7 @@
 {% import 'comun/modal_eliminar.html' as modal_eliminar %}
 
 {% block content %}
-<div class="container p-2 small"></div>
+<div class="container p-2">
 	<h2 class="text-center">Personas</h2>
 	<div class="row">
 		<div class="mr-2">
@@ -61,7 +61,7 @@
 						<a href="{{ url_for('routes_personas.editar_persona', persona_id=persona.id) }}"
 							class="btn btn-success"><i class="fa-regular fa-pen-to-square"></i></a>
 						<button class="btn btn-danger" data-toggle="modal"
-							data-target="#eliminarModal{{ persona.id }}"><i class="fa-solid fa-trash"></i></button>
+							data-target="#eliminarModal{{ persona.id }}"><i class="fa-regular fa-trash-can"></i></button>
 					</td>
 				</tr>
 				<!-- Modal para confirmar la eliminación -->
@@ -76,7 +76,7 @@
 		</table>
 
 		{{ paginado.render_paginado('routes_personas.obtener_lista_paginada', personas, filtros=filtros) }}
-
+	</div>
 <a class="btn btn-primary" href="{{ url_for('routes.index') }}">Volver a Inicio</a>
 </div>
 

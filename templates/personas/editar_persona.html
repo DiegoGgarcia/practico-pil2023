@@ -1,6 +1,7 @@
 {% extends 'comun/base.html' %}
 {% import 'comun/genero.html' as genero %}
 {% import 'comun/lugares.html' as lugares %}
+{% import 'comun/paginado.html' as paginado %}
 
 {% block content %}
 <div class="container p-2">
@@ -44,6 +45,39 @@
             <button class="btn btn-success btn-sm" type="submit" id="guardar-persona">Guardar Cambios</button>
         </div>
     </form>
+
+
+    <div id="carreras-list">
+        <h3>Carreras</h3>
+        <table class="table table-hover table-sm">
+            <thead>
+                <tr>
+                    <th>Universidad</th>
+                    <th>Facultad</th>
+                    <th>Campus</th>
+                    <th>Programa</th>
+                    <th>Rol</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cadauna in resultado_carreras %}
+                <tr>
+                    <td>{{ cadauna.carrera.universidad.nombre }}</td>
+                    <td>{{ cadauna.carrera.facultad.nombre }}</td>
+                    <td>{{ cadauna.carrera.campus.nombre }}</td>
+                    <td>{{ cadauna.carrera.programa.nombre }}</td>
+                    <td>{{ cadauna.tipopersona.nombre }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {{ paginado.render_paginado('routes_personas.editar_persona', resultado_carreras, filtros=filtros) }}
+    </div>
+
+
+
+
+
     <a class="btn btn-primary" href="{{ url_for('routes_personas.obtener_lista_paginada') }}">Volver a la Lista</a>
 </div>
 
