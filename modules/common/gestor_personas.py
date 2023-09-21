@@ -194,4 +194,4 @@ class gestor_personas(ResponseMessage):
 		return self.obtenerResultado()
 
 	def obtener_todo(self):
-		return Persona.obtener_todo()
+		return Persona.query.all()

@@ -49,7 +49,7 @@
 
     <div id="carreras-list">
         <h3>Carreras</h3>
-        <table class="table table-hover table-sm">
+        <table id="carreras" class="display" style="width:100%">
             <thead>
                 <tr>
                     <th>Universidad</th>
@@ -71,14 +71,17 @@
                 {% endfor %}
             </tbody>
         </table>
-        {{ paginado.render_paginado('routes_personas.editar_persona', resultado_carreras, filtros=filtros) }}
     </div>
-
-
-
-
 
     <a class="btn btn-primary" href="{{ url_for('routes_personas.obtener_lista_paginada') }}">Volver a la Lista</a>
 </div>
-
+<script>
+    $(document).ready( function () {
+  var table = $('#carreras').DataTable({
+    language: {
+      url: 'http://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+    },
+  });
+} );
+</script>
 {% endblock %}

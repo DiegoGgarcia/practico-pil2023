@@ -33,8 +33,8 @@
 		</div>
 	</form>
 
-	<div id="personas-list">
-		<table class="table">
+	<div id="personas-list"></div>
+		<table id="personas" class="display" style="width:100%;">
 			<thead>
 				<tr>
 					<th>ID</th>
@@ -48,7 +48,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{% for persona in personas.items %}
+				{% for persona in personas %}
 				<tr>
 					<td>{{ persona.id }}</td>
 					<td>{{ persona.nombre }}</td>
@@ -75,9 +75,19 @@
 			</tbody>
 		</table>
 
-		{{ paginado.render_paginado('routes_personas.obtener_lista_paginada', personas, filtros=filtros) }}
 	</div>
 <a class="btn btn-primary" href="{{ url_for('routes.index') }}">Volver a Inicio</a>
 </div>
+
+<script>
+$(document).ready( function () {
+  var table = $('#personas').DataTable({
+    language: {
+      url: 'http://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+    },
+  });
+
+} );
+</script>
 
 {% endblock %}

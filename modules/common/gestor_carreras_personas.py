@@ -10,13 +10,7 @@ class gestor_carreras_personas(ResponseMessage):
 
 	def obtener_carreras_por_persona(persona):
 		carreras = (
-			db.session.query(personasCarreras).filter(personasCarreras.persona==persona)
-			.join(Carrera)
-			.join(Universidad)
-			.join(Facultad)
-			.join(Campus)
-			.join(Programa)
-			.order_by(Universidad.nombre, Facultad.nombre, Campus.nombre, Programa.nombre).all()
+			db.session.query(personasCarreras).filter(personasCarreras.persona==persona).all()
 		)
 		return carreras
 	
