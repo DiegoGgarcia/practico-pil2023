@@ -22,17 +22,14 @@ def obtener_lista_paginada():
         'apellido': apellido,
         'email': email
     }
-    personas, total_paginas = gestor_personas().obtener_pagina(page, **filtros)
-    return render_template('personas/personas.html', personas=personas, total_paginas=total_paginas, csrf=csrf, filtros=filtros)
+    personas = gestor_personas().obtener_todo()
+    return render_template('personas/personas.html', personas=personas,  csrf=csrf, filtros=filtros)
 
 @personas_bp.route('/personas/editar', methods=['GET', 'POST'])
 @login_required
 def editar_persona():
     persona_id = request.args.get('persona_id', type=int)
-    page = request.args.get('page', default=1, type=int)
-    filtros = {
-        'persona_id': persona_id
-    }
+
     if request.method == 'POST':
         formulario_data = request.form.to_dict()
         resultado=gestor_personas().editar(persona_id, **formulario_data)
@@ -45,8 +42,8 @@ def editar_persona():
     resultado=gestor_personas().obtener(persona_id)
     if resultado["Exito"]:
         persona=resultado["Resultado"]
-        resultado_carreras, total_paginas = gestor_carreras_personas().obtener_pagina(page, persona=persona)
-        return render_template('personas/editar_persona.html', persona=persona, resultado_carreras=resultado_carreras, total_paginas=total_paginas,filtros=filtros,csrf=csrf)
+        resultado_carreras = gestor_carreras_personas.obtener_carreras_por_persona(persona=persona)
+        return render_template('personas/editar_persona.html', persona=persona, resultado_carreras=resultado_carreras, csrf=csrf)
     else:
         flash(resultado["MensajePorFallo"], 'warning')
         return redirect(url_for('routes_personas.obtener_lista_paginada'))
