@@ -3,11 +3,16 @@ import flask_sqlalchemy
 from sqlalchemy import and_
 from sqlalchemy.inspection import inspect
 from math import ceil
+from datetime import datetime
 
 db = SQLAlchemy()
 
 class BaseEntity(db.Model):
 	__abstract__ = True
+
+	fecha_alta = db.Column(db.DateTime, default=datetime.utcnow)
+	fecha_modificacion = db.Column(db.DateTime, onupdate=datetime.utcnow)
+	activo = db.Column(db.Boolean, default=True)
 
 	def guardar(self):
 		exito=True

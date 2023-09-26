@@ -13,7 +13,6 @@ personas_bp = Blueprint('routes_personas', __name__)
 @personas_bp.route('/personas', methods=['GET'])
 @login_required
 def obtener_lista_paginada():
-    page = request.args.get('page', default=1, type=int)
     nombre = request.args.get('nombre', default="", type=str)
     apellido = request.args.get('apellido', default="", type=str)
     email = request.args.get('email', default="", type=str)
@@ -23,7 +22,7 @@ def obtener_lista_paginada():
         'email': email
     }
     personas = gestor_personas().obtener_todo()
-    return render_template('personas/personas.html', personas=personas,  csrf=csrf, filtros=filtros)
+    return render_template('personas/personas.html', personas=personas, filtros=filtros,  csrf=csrf)
 
 @personas_bp.route('/personas/editar', methods=['GET', 'POST'])
 @login_required
@@ -42,12 +41,12 @@ def editar_persona():
     resultado=gestor_personas().obtener(persona_id)
     if resultado["Exito"]:
         persona=resultado["Resultado"]
-        resultado_carreras = gestor_carreras_personas.obtener_carreras_por_persona(persona=persona)
+        resultado_carreras = gestor_carreras_personas.obtener_carreras_por_persona(persona)
         return render_template('personas/editar_persona.html', persona=persona, resultado_carreras=resultado_carreras, csrf=csrf)
     else:
         flash(resultado["MensajePorFallo"], 'warning')
         return redirect(url_for('routes_personas.obtener_lista_paginada'))
-    
+
 @personas_bp.route('/personas/<int:persona_id>', methods=['POST'])
 @login_required
 def eliminar_persona(persona_id):
@@ -71,7 +70,6 @@ def crear_persona():
         else:
             flash(resultado["MensajePorFallo"], 'warning')
     return render_template('personas/crear_persona.html', formulario_data=formulario_data, csrf=csrf)
-
 
 @personas_bp.route('/personas/generar_excel', methods=['GET', 'POST'])
 @login_required
