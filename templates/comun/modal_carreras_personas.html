@@ -1,0 +1,294 @@
+{% macro asignar_carrera(id_persona) %}
+<div class="modal fade" id="agregarModal{{ id_persona }}" tabindex="-1" role="dialog"
+	aria-labelledby="agregarModalLabel{{ id_persona }}" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="agregarModalLabel{{ id_persona }}">Agregar carrera</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+
+				<div class="mt-2">
+					<label for="universidad" class="form-label">Universidad</label>
+					<select class="form-control" id="universidad" name="universidad">
+						<option value="" disabled selected>Seleccionar Universidad</option>
+					</select>
+				</div>
+				<div class="mt-2">
+					<label for="facultad" class="form-label">Facultad</label>
+					<select class="form-control" id="facultad" name="facultad" disabled>
+						<option value="" disabled selected>Seleccionar Facultad</option>
+					</select>
+				</div>
+				<div class="mt-2">
+					<label for="campus" class="form-label">Campus</label>
+					<select class="form-control" id="campus" name="campus" disabled>
+						<option value="" disabled selected>Seleccionar Campus</option>
+					</select>
+				</div>
+				<div class="mt-2">
+					<label for="programa" class="form-label">Programa</label>
+					<select class="form-control" id="programa" name="programa" disabled>
+						<option value="" disabled selected>Seleccionar Programa</option>
+					</select>
+				</div>
+				<div class="mt-2">
+					<label for="rol" class="form-label">Rol</label>
+					<select class="form-control" id="rol" name="rol">
+						<option value="" disabled selected>Seleccionar Rol</option>
+					</select>
+				</div>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-success" id="agregar-carrera">Acepar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const universidadSelect = document.getElementById("universidad");
+		const facultadSelect = document.getElementById("facultad");
+		const campusSelect = document.getElementById("campus");
+		const programaSelect = document.getElementById("programa");
+		const rolSelect = document.getElementById("rol");
+		const agregarButton = document.getElementById("agregar-carrera");
+
+		// Cargar opciones de Roles desde la API
+		fetch('/api/carreras/obtener_roles')
+			.then(response => response.json())
+			.then(data => {
+				if (data.Exito) {
+					const roles = data.Resultado;
+					roles.forEach(rol => {
+						const option = document.createElement("option");
+						option.value = rol.nombre;
+						option.textContent = rol.nombre;
+						rolSelect.appendChild(option);
+					});
+				}
+			})
+			.catch(error => console.error("Error al cargar Universidades:", error));
+
+		// Cargar opciones de Universidad desde la API
+		fetch('/api/carreras/obtener_universidades')
+			.then(response => response.json())
+			.then(data => {
+				if (data.Exito) {
+					const universidades = data.Resultado;
+					universidades.forEach(universidad => {
+						const option = document.createElement("option");
+						option.value = universidad.nombre;
+						option.textContent = universidad.nombre;
+						universidadSelect.appendChild(option);
+					});
+					const otraOpcion = document.createElement("option");
+					otraOpcion.value = "Otro";
+					otraOpcion.textContent = "Otro";
+					universidadSelect.appendChild(otraOpcion);
+
+					// Disparar manualmente el evento change del Universidad
+					const changeEvent = new Event('change');
+					universidadSelect.dispatchEvent(changeEvent);
+				}
+			})
+			.catch(error => console.error("Error al cargar Universidades:", error));
+
+		// Evento de cambio para Universidad
+		universidadSelect.addEventListener('change', function () {
+			const selecteduniversidad = this.value;
+
+			// Resetear las opciones anteriores
+			facultadSelect.innerHTML = '<option value="" disabled selected>Seleccionar Facultad</option>';
+			campusSelect.innerHTML = '<option value="" disabled selected>Seleccionar Campus</option>';
+			programaSelect.innerHTML = '<option value="" disabled selected>Seleccionar Programa</option>';
+			facultadSelect.disabled = true;
+			campusSelect.disabled = true;
+			programaSelect.disabled = true;
+
+			// Cargar opciones de facultad desde la API
+			if (selecteduniversidad) {
+				fetch('/api/carreras/obtener_facultades', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ universidad: selecteduniversidad })
+				})
+					.then(response => response.json())
+					.then(data => {
+						if (data.Exito) {
+							const facultades = data.Resultado;
+							facultades.forEach(facultad => {
+								const option = document.createElement("option");
+								option.value = facultad.nombre;
+								option.textContent = facultad.nombre;
+								facultadSelect.appendChild(option);
+							});
+							facultadSelect.disabled = false;
+							const otraOpcion = document.createElement("option");
+							otraOpcion.value = "Otro";
+							otraOpcion.textContent = "Otro";
+							facultadSelect.appendChild(otraOpcion);
+							// Disparar manualmente el evento change de facultad
+							const changeEvent = new Event('change');
+							facultadSelect.dispatchEvent(changeEvent);
+
+						}
+					})
+					.catch(error => console.error("Error al cargar Facultades:", error));
+			}
+		});
+
+		// Evento de cambio para facultad
+		facultadSelect.addEventListener('change', function () {
+			const selecteduniversidad = universidadSelect.value;
+			const selectedfacultad = this.value;
+
+			// Resetear las opciones anteriores
+			campusSelect.innerHTML = '<option value="" disabled selected>Seleccionar Campus</option>';
+			programaSelect.innerHTML = '<option value="" disabled selected>Seleccionar Programa</option>';
+			campusSelect.disabled = true;
+			programaSelect.disabled = true;
+
+			// Cargar opciones de campus desde la API
+			if (selecteduniversidad && selectedfacultad) {
+				fetch('/api/carreras/obtener_campus', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ universidad: selecteduniversidad, facultad: selectedfacultad })
+				})
+					.then(response => response.json())
+					.then(data => {
+						if (data.Exito) {
+							const campuses = data.Resultado;
+							campuses.forEach(campus => {
+								const option = document.createElement("option");
+								option.value = campus.nombre;
+								option.textContent = campus.nombre;
+								campusSelect.appendChild(option);
+							});
+							campusSelect.disabled = false;
+							const otraOpcion = document.createElement("option");
+							otraOpcion.value = "Otro";
+							otraOpcion.textContent = "Otro";
+							campusSelect.appendChild(otraOpcion);
+							// Disparar manualmente el evento change de campus
+							const changeEvent = new Event('change');
+							campusSelect.dispatchEvent(changeEvent);
+						}
+					})
+					.catch(error => console.error("Error al cargar Campus:", error));
+			}
+		});
+
+		// Evento de cambio para campus
+		campusSelect.addEventListener('change', function () {
+			const selecteduniversidad = universidadSelect.value;
+			const selectedfacultad = facultadSelect.value;
+			const selectedcampus = this.value;
+
+			// Resetear las opciones anteriores
+			programaSelect.innerHTML = '<option value="" disabled selected>Seleccionar Programa</option>';
+			programaSelect.disabled = true;
+
+			// Cargar opciones de programa desde la API
+			if (selecteduniversidad && selectedfacultad && selectedcampus) {
+				fetch('/api/carreras/obtener_programas', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ universidad: selecteduniversidad, facultad: selectedfacultad, campus: selectedcampus })
+				})
+					.then(response => response.json())
+					.then(data => {
+						if (data.Exito) {
+							const programas = data.Resultado;
+							programas.forEach(programa => {
+								const option = document.createElement("option");
+								option.value = programa.nombre;
+								option.textContent = programa.nombre;
+								programaSelect.appendChild(option);
+							});
+							programaSelect.disabled = false;
+							const otraOpcion = document.createElement("option");
+							otraOpcion.value = "Otro";
+							otraOpcion.textContent = "Otro";
+							programaSelect.appendChild(otraOpcion);
+							// Disparar manualmente el evento change de programa
+							const changeEvent = new Event('change');
+							programaSelect.dispatchEvent(changeEvent);
+						}
+					})
+					.catch(error => console.error("Error al cargar Programas:", error));
+			}
+		});
+
+		// Agregar opción "Otro" y manejar entrada de nuevos elementos
+		const selects = [universidadSelect, facultadSelect, campusSelect, programaSelect];
+		selects.forEach(select => {
+			select.addEventListener('change', function () {
+				if (select.value === 'Otro') {
+					const nuevoElemento = prompt(`Ingrese nuevo valor para ${select.id}`);
+					if (nuevoElemento) {
+						const nuevaOpcion = document.createElement("option");
+						nuevaOpcion.value = nuevoElemento;
+						nuevaOpcion.textContent = nuevoElemento;
+						select.insertBefore(nuevaOpcion, select.lastElementChild);
+						select.value = nuevoElemento;
+					} else {
+						// Restaurar la selección anterior
+						select.value = select.id === 'universidad' ? seleccionuniversidadAnterior :
+							select.id === 'facultad' ? seleccionfacultadAnterior :
+								select.id === 'campus' ? seleccioncampusAnterior :
+									select.id === 'programa' ? seleccionprogramaAnterior :
+										"";
+					}
+				}
+			});
+		});
+
+		// Agregar un evento al botón para aceptar
+		$('#agregar-carrera').click(function () {
+			const selecteduniversidad = universidadSelect.value;
+			const selectedfacultad = facultadSelect.value;
+			const selectedcampus = campusSelect.value;
+			const selectedprograma = programaSelect.value;
+			const selectedrol = rolSelect.value;
+			// Comprobar si todas las constantes tienen datos
+			if (selecteduniversidad && selectedfacultad && selectedcampus && selectedprograma && selectedrol) {
+
+				fetch('/api/carreras/asignar_carrera', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ universidad: selecteduniversidad, facultad: selectedfacultad, campus: selectedcampus, programa: selectedprograma, rol:selectedrol, id_persona: "{{ id_persona }}" })
+				})
+					.then(response => response.json())
+					.then(data => {
+						if (data.Exito) {
+							alert('Carrera asignada con éxito');
+							$('#agregarModal{{ id_persona }}').modal('hide');
+							cargarDatos(id_persona);
+						}
+					})
+					.catch(error => console.error("Error al cargar Programas:", error));
+
+			} else {
+				// Al menos una constante no tiene datos
+				alert('Por favor, complete todos los campos antes de continuar.');
+			}
+		});
+	});
+</script>
+{% endmacro %}

@@ -10,9 +10,9 @@ db = SQLAlchemy()
 class BaseEntity(db.Model):
 	__abstract__ = True
 
-	fecha_alta = db.Column(db.DateTime, default=datetime.utcnow)
-	fecha_modificacion = db.Column(db.DateTime, onupdate=datetime.utcnow)
-	activo = db.Column(db.Boolean, default=True)
+	#fecha_alta = db.Column(db.DateTime, default=datetime.utcnow)
+	#fecha_modificacion = db.Column(db.DateTime, onupdate=datetime.utcnow)
+	#activo = db.Column(db.Boolean, default=True)
 
 	def guardar(self):
 		exito=True
