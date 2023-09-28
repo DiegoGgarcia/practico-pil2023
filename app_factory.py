@@ -7,6 +7,7 @@ from modules.routes_personas import personas_bp
 from modules.apis.personas import PersonasResource
 from modules.apis.lugares import LugaresResource
 from modules.apis.generos import GenerosResource
+from modules.apis.carreras import CarrerasResource
 from modules.models.base import db 
 from config import db_connector, db_user, db_password, db_ip_address, db_name
 from flask_jwt_extended import JWTManager
@@ -35,6 +36,7 @@ def create_app():
 	app.register_error_handler(404, page_not_found)
 	api.add_resource(PersonasResource, '/api/personas', '/api/personas/<int:persona_id>')
 	api.add_resource(LugaresResource, '/api/lugares', '/api/lugares/<string:lugar_type>')
+	api.add_resource(CarrerasResource, '/api/carreras', '/api/carreras/<string:recurso>')
 	api.add_resource(GenerosResource, '/api/generos')
 
 	return app

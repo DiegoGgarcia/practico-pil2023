@@ -16,13 +16,15 @@ def obtener_lista_paginada():
     nombre = request.args.get('nombre', default="", type=str)
     apellido = request.args.get('apellido', default="", type=str)
     email = request.args.get('email', default="", type=str)
+    cedula = request.args.get('personal_id', default="", type=str)
     filtros = {
         'nombre': nombre,
         'apellido': apellido,
-        'email': email
+        'email': email,
+        'personal_id':cedula
     }
-    personas = gestor_personas().obtener_todo()
-    return render_template('personas/personas.html', personas=personas, filtros=filtros,  csrf=csrf)
+    personas = gestor_personas().obtener_con_filtro(**filtros)
+    return render_template('personas/personas.html', personas=personas,  csrf=csrf, filtros=filtros)
 
 @personas_bp.route('/personas/editar', methods=['GET', 'POST'])
 @login_required
@@ -41,8 +43,7 @@ def editar_persona():
     resultado=gestor_personas().obtener(persona_id)
     if resultado["Exito"]:
         persona=resultado["Resultado"]
-        resultado_carreras = gestor_carreras_personas.obtener_carreras_por_persona(persona)
-        return render_template('personas/editar_persona.html', persona=persona, resultado_carreras=resultado_carreras, csrf=csrf)
+        return render_template('personas/editar_persona.html', persona=persona, csrf=csrf)
     else:
         flash(resultado["MensajePorFallo"], 'warning')
         return redirect(url_for('routes_personas.obtener_lista_paginada'))

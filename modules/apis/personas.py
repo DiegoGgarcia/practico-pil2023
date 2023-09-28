@@ -64,7 +64,7 @@ class PersonasResource(Resource):
 		
 	@jwt_or_login_required()
 	def delete(self, persona_id):
-		resultado=gestor_personas().obtener(persona_id)
+		resultado=gestor_personas().eliminar(persona_id)
 		if resultado["Exito"]:
 			return {"Exito":resultado["Exito"],"MensajePorFallo":resultado["MensajePorFallo"],"Resultado":None}, 201
 		else:

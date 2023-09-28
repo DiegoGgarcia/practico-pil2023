@@ -1,7 +1,7 @@
 {% extends 'comun/base.html' %}
 {% import 'comun/genero.html' as genero %}
 {% import 'comun/lugares.html' as lugares %}
-{% import 'comun/paginado.html' as paginado %}
+{% import 'comun/modal_carreras_personas.html' as agregar_carrera %}
 
 {% block content %}
 <div class="container p-2">
@@ -49,7 +49,9 @@
 
     <div id="carreras-list">
         <h3>Carreras</h3>
-        <table id="carreras" class="display" style="width:100%">
+        <button class="btn btn-danger" data-toggle="modal" data-target="#agregarModal{{ persona.id }}"><i
+            class="fa-regular fa-trash-can"></i></button>
+        <table id="carreras" class="display nowrap" style="width:100%">
             <thead>
                 <tr>
                     <th>Universidad</th>
@@ -57,31 +59,103 @@
                     <th>Campus</th>
                     <th>Programa</th>
                     <th>Rol</th>
+                    <th style="width:1%"></th>
                 </tr>
             </thead>
             <tbody>
-                {% for cadauna in resultado_carreras %}
-                <tr>
-                    <td>{{ cadauna.carrera.universidad.nombre }}</td>
-                    <td>{{ cadauna.carrera.facultad.nombre }}</td>
-                    <td>{{ cadauna.carrera.campus.nombre }}</td>
-                    <td>{{ cadauna.carrera.programa.nombre }}</td>
-                    <td>{{ cadauna.tipopersona.nombre }}</td>
-                </tr>
-                {% endfor %}
+                <!-- Aquí se cargaran los datos -->
             </tbody>
         </table>
     </div>
 
     <a class="btn btn-primary" href="{{ url_for('routes_personas.obtener_lista_paginada') }}">Volver a la Lista</a>
 </div>
+
+			<!-- Modal para agregar carrera -->
+			{{ agregar_carrera.asignar_carrera(persona.id) }}
+
 <script>
-    $(document).ready( function () {
-  var table = $('#carreras').DataTable({
-    language: {
-      url: 'http://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-    },
-  });
-} );
+        var id_persona = {{ persona.id }};
+        var dataTable = $('#carreras').DataTable({
+            language: { url: 'http://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
+        });
+            // Función para cargar los datos desde la API
+            function cargarDatos(id) {
+            $.ajax({
+                url: '/api/carreras/obtener_carreras',
+                method: 'POST',
+                data: JSON.stringify({ id_persona: id }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (data) {
+                    // Verificar si la consulta fue exitosa
+                    if (data.Exito) {
+                        // Limpiar la tabla antes de agregar los datos
+                        dataTable.clear().draw();
+
+                        // Recorrer la lista de resultados y agregar cada fila a la tabla
+                        $.each(data.Resultado, function (index, carrera) {
+                            var botonEliminar = '<button class="btn btn-danger eliminarButton" data-id="' + carrera.id + '"><i class="fa-regular fa-trash-can"></i></button>';
+                            dataTable.row.add([
+                                carrera.universidad,
+                                carrera.facultad,
+                                carrera.campus,
+                                carrera.programa,
+                                carrera.rol,
+                                botonEliminar
+                            ]).draw();
+                        });
+                    } else {
+                        // Si la consulta no fue exitosa, mostrar un mensaje de error
+                        alert('Error: ' + data.MensajePorFallo);
+                    }
+                },
+                error: function () {
+                    // En caso de error en la solicitud AJAX
+                    alert('Error al cargar los datos desde la API.');
+                }
+            });
+        }
+
+    $(document).ready(function () {
+        // Asociar un controlador de eventos a los botones de eliminación
+        $(document).on('click', '.eliminarButton', function () {
+            var id = $(this).data('id');
+            confirmarEliminacion(id);
+        });
+
+        // Función para confirmar la eliminación
+        function confirmarEliminacion(id) {
+            if (window.confirm('¿Está seguro de que desea eliminar este registro?')) {
+                eliminarRegistro(id);
+            }
+        }
+
+        // Función para eliminar un registro
+        function eliminarRegistro(id) {
+            $.ajax({
+                url: '/api/carreras/eliminar',
+                method: 'DELETE',
+                data: JSON.stringify({ id: id }),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.Exito) {
+                        // Recargar los datos después de eliminar un registro exitosamente
+                        cargarDatos(id_persona);
+                    } else {
+                        alert('Error al eliminar el registro: ' + data.MensajePorFallo);
+                    }
+                },
+                error: function () {
+                    alert('Error al enviar la solicitud de eliminación.');
+                }
+            });
+        }
+
+        // Cargar los datos inicialmente
+        cargarDatos(id_persona);
+
+    });
 </script>
 {% endblock %}
