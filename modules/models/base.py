@@ -10,9 +10,9 @@ db = SQLAlchemy()
 class BaseEntity(db.Model):
 	__abstract__ = True
 
-	#fecha_alta = db.Column(db.DateTime, default=datetime.utcnow)
-	#fecha_modificacion = db.Column(db.DateTime, onupdate=datetime.utcnow)
-	#activo = db.Column(db.Boolean, default=True)
+	fecha_alta = db.Column(db.DateTime, default=datetime.utcnow)
+	fecha_modificacion = db.Column(db.DateTime, onupdate=datetime.utcnow)
+	activo = db.Column(db.Boolean, default=True)
 
 	def guardar(self):
 		exito=True
@@ -50,7 +50,12 @@ class BaseEntity(db.Model):
 	def serialize(self):
 		serializable_data = {}
 		for column in self.__table__.columns:
-			serializable_data[column.name] = getattr(self, column.name)
+			value = getattr(self, column.name)
+			if isinstance(value, datetime):
+				# Si el valor es de tipo datetime, aplicar isoformat()
+				serializable_data[column.name] = value.isoformat()
+			else:
+				serializable_data[column.name] = value
 		return serializable_data
 	
 	@staticmethod
