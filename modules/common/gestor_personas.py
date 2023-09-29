@@ -153,7 +153,7 @@ class gestor_personas(ResponseMessage):
 			self.Exito = False
 			self.MensajePorFallo = "La persona no existe"
 			return self.obtenerResultado()
-		resultado_borrar=persona.borrar()
+		resultado_borrar=persona.activar(False)
 		self.Exito=resultado_borrar["Exito"]
 		self.MensajePorFallo=resultado_borrar["MensajePorFallo"]
 		return self.obtenerResultado()
@@ -196,7 +196,7 @@ class gestor_personas(ResponseMessage):
 		return Persona.query.all()
 	
 	def obtener_con_filtro(self, **kwargs):
-		query = Persona.query
+		query = Persona.query.filter(Persona.activo==True)
 		if 'nombre' in kwargs:
 			query = query.filter(Persona.nombre.ilike(f"%{kwargs['nombre']}%"))
 		if 'apellido' in kwargs:

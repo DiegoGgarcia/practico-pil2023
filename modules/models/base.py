@@ -38,7 +38,19 @@ class BaseEntity(db.Model):
 			exito=False
 			mensaje=str(e)
 		return {"Resultado":None, "Exito":exito, "MensajePorFallo":mensaje}
-		
+
+	def activar(self, estado):
+		exito=True
+		mensaje=""
+		try:
+			self.activo=estado
+			db.session.commit()
+		except Exception as e:
+			db.session.rollback()
+			exito=False
+			mensaje=str(e)
+		return {"Resultado":None, "Exito":exito, "MensajePorFallo":mensaje}
+
 	@classmethod
 	def crear_y_obtener(cls, **kwargs):
 		entidad = db.session.query(cls).filter_by(**kwargs).first()

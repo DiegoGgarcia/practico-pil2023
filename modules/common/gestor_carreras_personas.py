@@ -10,7 +10,10 @@ class gestor_carreras_personas(ResponseMessage):
 
 	def obtener_carreras_por_persona(self, persona):
 		carreras = (
-			db.session.query(personasCarreras).filter(personasCarreras.persona==persona).all()
+			db.session.query(personasCarreras)
+			.filter(personasCarreras.persona==persona)
+			.filter(personasCarreras.activo==True)
+			.all()
 		)
 		return carreras
 	
@@ -27,7 +30,7 @@ class gestor_carreras_personas(ResponseMessage):
 			self.Exito = False
 			self.MensajePorFallo = "La carrera no existe"
 			return self.obtenerResultado()
-		resultado_borrar=carrera.borrar()
+		resultado_borrar=carrera.activar(False)
 		self.Exito=resultado_borrar["Exito"]
 		self.MensajePorFallo=resultado_borrar["MensajePorFallo"]
 		return self.obtenerResultado()
