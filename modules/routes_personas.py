@@ -75,7 +75,17 @@ def crear_persona():
 @personas_bp.route('/personas/generar_excel', methods=['GET', 'POST'])
 @login_required
 def generar_excel():
-    personas=gestor_personas().obtener_todo()
+    nombre = request.args.get('nombre', default="", type=str)
+    apellido = request.args.get('apellido', default="", type=str)
+    email = request.args.get('email', default="", type=str)
+    cedula = request.args.get('personal_id', default="", type=str)
+    filtros = {
+        'nombre': nombre,
+        'apellido': apellido,
+        'email': email,
+        'personal_id':cedula
+    }
+    personas = gestor_personas().obtener_con_filtro(**filtros)
     personas_data=[]
     for persona in personas:
         pd={}

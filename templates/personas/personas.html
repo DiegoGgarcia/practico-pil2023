@@ -10,6 +10,10 @@
 		</div>
 		<div>
 			<form method="GET" action="{{ url_for('routes_personas.generar_excel') }}" class="mb-3">
+				<input type="hidden" name="nombre" value="{{ filtros.get('nombre', '') }}">
+				<input type="hidden" name="apellido" value="{{ filtros.get('apellido', '') }}">
+				<input type="hidden" name="email" value="{{ filtros.get('email', '') }}">
+				<input type="hidden" name="personal_id" value="{{ filtros.get('personal_id', '') }}">
 				<button class="btn btn-info mb-3" type="submit"><i class="fa-regular fa-file-excel"></i></button>
 			</form>
 		</div>
