@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from modules.auth import jwt_or_login_required
+from modules.apis.auth import jwt_or_login_required
 from modules.common.gestor_generos import gestor_generos
 
 class GenerosResource(Resource):

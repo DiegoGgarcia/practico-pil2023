@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import request
-from modules.auth import jwt_or_login_required
+from modules.apis.auth import jwt_or_login_required
 from modules.common.gestor_carreras_personas import gestor_carreras_personas
 from modules.common.gestor_personas import gestor_personas
 from modules.common.gestor_carreras import gestor_carreras
